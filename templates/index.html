@@ -1,146 +1,331 @@
 <!DOCTYPE html>
 <html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sun'iy Intellekt Testi</title>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="../static/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Imtihon</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        #video-container {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 400px;
-            height: 300px;
-            border: 2px solid rgb(34, 168, 0);
-            padding: 5px;
-        }
-        #warnings {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: red;
-            color: white;
-            padding: 10px;
-            font-weight: bold;
-            border-radius: 5px;
-            display: none;
-        }
-        .test-question {
-            margin: 15px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            width: 50%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .test-question p {
-            text-align: left;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            padding-left: 20px;
-        }
-        .option {
-            margin: 5px 0;
-        }
-        #submit-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        #submit-btn:hover {
-            background-color: #218838;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #video-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        width: 400px;
+        height: 300px;
+        border: 2px solid rgb(34, 168, 0);
+        padding: 5px;
+      }
+      #warnings {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: red;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        border-radius: 5px;
+        display: none;
+        z-index: 1000;
+      }
+      .test-question {
+        margin: 15px auto;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        width: 50%;
+        text-align: left;
+      }
+      .options {
+        display: flex;
+        flex-direction: column;
+        padding-left: 10px;
+      }
+      .option {
+        margin: 5px 0;
+      }
+      #submit-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      #submit-btn:hover {
+        background-color: #218838;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Sun'iy Intellekt Testi</h1>
-    
+
     <div id="warnings"></div>
-    
+
     <div id="video-container">
-        <img src="/video_feed" width="400" height="300">
+      <img src="/video_feed" width="400" height="300" />
     </div>
-    
+
     <div id="test-container"></div>
-    
-    <div id="result"></div>
-    
-    <button id="submit-btn">Natijani tekshirish</button>
+
+    <button id="submit-btn">Testni Yakunlash</button>
 
     <script>
-        async function fetchWarnings() {
-            const response = await fetch('/warnings');
-            const warnings = await response.json();
-            const warningsDiv = document.getElementById('warnings');
-            if (warnings.length > 0) {
-                warningsDiv.style.display = 'block';
-                warningsDiv.innerHTML = warnings.map(warning => `<p>${warning}</p>`).join('');
-            } else {
-                warningsDiv.style.display = 'none';
-            }
-        }
-        setInterval(fetchWarnings, 1000);
+      document.addEventListener("DOMContentLoaded", function () {
+        const testContainer = document.getElementById("test-container");
+        const questions = [
+          {
+            q: "Sun'iy intellekt nima?",
+            a: "A) Ma'lumotlarga asoslangan dasturlar",
+            b: "B) Faqat robotlar uchun dastur",
+            c: "C) Fikr yurituvchi insonlar",
+            correct: "A",
+          },
+          {
+            q: "Mashina o‘rganish (Machine Learning) nima?",
+            a: "A) Kompyuterlarning tajribadan o‘rganishi",
+            b: "B) Dasturiy kod yozish",
+            c: "C) Faqat raqamli modellar yaratish",
+            correct: "A",
+          },
+          {
+            q: "Neyron tarmoqlar qanday ishlaydi?",
+            a: "A) Miyaga o‘xshash model bilan",
+            b: "B) Tasodifiy sonlar bilan",
+            c: "C) Harakat algoritmi bilan",
+            correct: "A",
+          },
+          {
+            q: "AI va ML o‘rtasidagi farq nima?",
+            a: "A) AI kengroq tushuncha",
+            b: "B) ML kengroq tushuncha",
+            c: "C) Ikkalasi ham bir xil",
+            correct: "A",
+          },
+          {
+            q: "GPT modeli qanday ishlaydi?",
+            a: "A) Matnni o‘rganib natija chiqaradi",
+            b: "B) Rasmlarni generatsiya qiladi",
+            c: "C) Signalni qayta ishlaydi",
+            correct: "A",
+          },
+          {
+            q: "Sun'iy intellektning asosiy turlari nimalar?",
+            a: "A) ANI, AGI, ASI",
+            b: "B) NLP, CNN, RNN",
+            c: "C) Machine Learning, Deep Learning, AI",
+            correct: "A",
+          },
+          {
+            q: "AI qaysi sohalarda ishlatiladi?",
+            a: "A) Deyarli hamma joyda",
+            b: "B) Faqat robototexnikada",
+            c: "C) Faqat tibbiyotda",
+            correct: "A",
+          },
+          {
+            q: "Dasturiy ta’minotda sun'iy intellekt qanday qo‘llaniladi?",
+            a: "A) Avtomatlashtirish orqali",
+            b: "B) Qo‘lda kod yozish orqali",
+            c: "C) Raqamli signallarni yozish orqali",
+            correct: "A",
+          },
+          {
+            q: "AI xavfsizlikka qanday ta’sir qiladi?",
+            a: "A) Kiberxavfsizlikni kuchaytiradi",
+            b: "B) Faqat tahdid yaratadi",
+            c: "C) AI xavfsizlik bilan bog‘liq emas",
+            correct: "A",
+          },
+          {
+            q: "Tabiiy tilni qayta ishlash (NLP) nima?",
+            a: "A) Matn va nutqni tushunish",
+            b: "B) Raqamli kodlar yozish",
+            c: "C) Robotlarni harakatga keltirish",
+            correct: "A",
+          },
+        ];
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const testContainer = document.getElementById("test-container");
-            const questions = [
-                {q: "Sun'iy intellekt nima?", a: "A) Ma'lumotlarga asoslangan dasturlar", b: "B) Faqat robotlar uchun dastur", c: "C) Fikr yurituvchi insonlar", correct: "A"},
-                {q: "Mashina o‘rganish (Machine Learning) nima?", a: "A) Kompyuterlarning tajribadan o‘rganishi", b: "B) Dasturiy kod yozish", c: "C) Faqat raqamli modellar yaratish", correct: "A"},
-                {q: "Neyron tarmoqlar qanday ishlaydi?", a: "A) Miyaga o‘xshash model bilan", b: "B) Tasodifiy sonlar bilan", c: "C) Harakat algoritmi bilan", correct: "A"},
-                {q: "AI va ML o‘rtasidagi farq nima?", a: "A) AI kengroq tushuncha", b: "B) ML kengroq tushuncha", c: "C) Ikkalasi ham bir xil", correct: "A"},
-                {q: "GPT modeli qanday ishlaydi?", a: "A) Matnni o‘rganib natija chiqaradi", b: "B) Rasmlarni generatsiya qiladi", c: "C) Signalni qayta ishlaydi", correct: "A"},
-                {q: "Sun'iy intellektning asosiy turlari nimalar?", a: "A) ANI, AGI, ASI", b: "B) NLP, CNN, RNN", c: "C) Machine Learning, Deep Learning, AI", correct: "A"},
-                {q: "AI qaysi sohalarda ishlatiladi?", a: "A) Deyarli hamma joyda", b: "B) Faqat robototexnikada", c: "C) Faqat tibbiyotda", correct: "A"},
-                {q: "Dasturiy ta’minotda sun'iy intellekt qanday qo‘llaniladi?", a: "A) Avtomatlashtirish orqali", b: "B) Qo‘lda kod yozish orqali", c: "C) Raqamli signallarni yozish orqali", correct: "A"},
-                {q: "AI xavfsizlikka qanday ta’sir qiladi?", a: "A) Kiberxavfsizlikni kuchaytiradi", b: "B) Faqat tahdid yaratadi", c: "C) AI xavfsizlik bilan bog‘liq emas", correct: "A"},
-                {q: "Tabiiy tilni qayta ishlash (NLP) nima?", a: "A) Matn va nutqni tushunish", b: "B) Raqamli kodlar yozish", c: "C) Robotlarni harakatga keltirish", correct: "A"}
-            ];
-            
-            questions.forEach((item, i) => {
-                const div = document.createElement("div");
-                div.className = "test-question";
-                div.innerHTML = `
-                    <p><b>${i + 1}. ${item.q}</b></p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q${i}" value="A"> ${item.a}</label>
-                        <label class="option"><input type="radio" name="q${i}" value="B"> ${item.b}</label>
-                        <label class="option"><input type="radio" name="q${i}" value="C"> ${item.c}</label>
-                    </div>
-                `;
-                testContainer.appendChild(div);
-            });
-
-            document.getElementById("submit-btn").addEventListener("click", function () {
-                let score = 0;
-                questions.forEach((item, i) => {
-                    const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-                    if (selectedOption && selectedOption.value === item.correct) {
-                        score++;
-                    }
-                });
-                document.getElementById("result").innerText = `Siz ${questions.length} tadan ${score} ta to‘g‘ri javob berdingiz!`;
-            });
+        questions.forEach((item, i) => {
+          const div = document.createElement("div");
+          div.className = "test-question";
+          div.innerHTML = `
+            <p><b>${i + 1}. ${item.q}</b></p>
+            <div class="options">
+              <label class="option"><input type="radio" name="q${i}" value="A"> ${
+            item.a
+          }</label>
+              <label class="option"><input type="radio" name="q${i}" value="B"> ${
+            item.b
+          }</label>
+              <label class="option"><input type="radio" name="q${i}" value="C"> ${
+            item.c
+          }</label>
+            </div>
+          `;
+          testContainer.appendChild(div);
         });
+
+        document
+          .getElementById("submit-btn")
+          .addEventListener("click", submitTest);
+      });
+
+      let testSubmitted = false;
+      const questionsData = [
+        {
+          q: "Sun'iy intellekt nima?",
+          a: "A) Ma'lumotlarga asoslangan dasturlar",
+          b: "B) Faqat robotlar uchun dastur",
+          c: "C) Fikr yurituvchi insonlar",
+          correct: "A",
+        },
+        {
+          q: "Mashina o‘rganish (Machine Learning) nima?",
+          a: "A) Kompyuterlarning tajribadan o‘rganishi",
+          b: "B) Dasturiy kod yozish",
+          c: "C) Faqat raqamli modellar yaratish",
+          correct: "A",
+        },
+        {
+          q: "Neyron tarmoqlar qanday ishlaydi?",
+          a: "A) Miyaga o‘xshash model bilan",
+          b: "B) Tasodifiy sonlar bilan",
+          c: "C) Harakat algoritmi bilan",
+          correct: "A",
+        },
+        {
+          q: "AI va ML o‘rtasidagi farq nima?",
+          a: "A) AI kengroq tushuncha",
+          b: "B) ML kengroq tushuncha",
+          c: "C) Ikkalasi ham bir xil",
+          correct: "A",
+        },
+        {
+          q: "GPT modeli qanday ishlaydi?",
+          a: "A) Matnni o‘rganib natija chiqaradi",
+          b: "B) Rasmlarni generatsiya qiladi",
+          c: "C) Signalni qayta ishlaydi",
+          correct: "A",
+        },
+        {
+          q: "Sun'iy intellektning asosiy turlari nimalar?",
+          a: "A) ANI, AGI, ASI",
+          b: "B) NLP, CNN, RNN",
+          c: "C) Machine Learning, Deep Learning, AI",
+          correct: "A",
+        },
+        {
+          q: "AI qaysi sohalarda ishlatiladi?",
+          a: "A) Deyarli hamma joyda",
+          b: "B) Faqat robototexnikada",
+          c: "C) Faqat tibbiyotda",
+          correct: "A",
+        },
+        {
+          q: "Dasturiy ta’minotda sun'iy intellekt qanday qo‘llaniladi?",
+          a: "A) Avtomatlashtirish orqali",
+          b: "B) Qo‘lda kod yozish orqali",
+          c: "C) Raqamli signallarni yozish orqali",
+          correct: "A",
+        },
+        {
+          q: "AI xavfsizlikka qanday ta’sir qiladi?",
+          a: "A) Kiberxavfsizlikni kuchaytiradi",
+          b: "B) Faqat tahdid yaratadi",
+          c: "C) AI xavfsizlik bilan bog‘liq emas",
+          correct: "A",
+        },
+        {
+          q: "Tabiiy tilni qayta ishlash (NLP) nima?",
+          a: "A) Matn va nutqni tushunish",
+          b: "B) Raqamli kodlar yozish",
+          c: "C) Robotlarni harakatga keltirish",
+          correct: "A",
+        },
+      ];
+
+      async function submitTest() {
+        if (testSubmitted) return;
+
+        let score = 0;
+        const results = [];
+
+        questionsData.forEach((item, i) => {
+          const selectedOption = document.querySelector(
+            `input[name="q${i}"]:checked`
+          );
+          const isCorrect =
+            selectedOption && selectedOption.value === item.correct;
+          if (isCorrect) score++;
+
+          results.push({
+            question: item.q,
+            selected: selectedOption ? selectedOption.value : null,
+            correct: item.correct,
+            isCorrect: isCorrect,
+          });
+        });
+
+        try {
+          await fetch("/submit-test", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              score: score,
+              total: questionsData.length,
+              details: results,
+            }),
+          });
+
+          testSubmitted = true;
+          window.location.href = "/"; // Redirect to home after submission
+        } catch (error) {
+          console.error("Test yuborishda xato:", error);
+        }
+      }
+
+      let hasAlerted = false;
+
+      async function fetchWarnings() {
+        if (hasAlerted) return;
+
+        try {
+          const response = await fetch("/warnings");
+          const data = await response.json();
+          console.log("Frontendda olingan ogohlantirishlar:", data);
+          const warningsDiv = document.getElementById("warnings");
+
+          if (data.warnings && data.warnings.length > 0) {
+            warningsDiv.style.display = "block";
+            warningsDiv.innerHTML = data.warnings.join("<br>");
+          } else {
+            warningsDiv.style.display = "none";
+            warningsDiv.innerHTML = "";
+          }
+
+          if (data.count >= 5 && !hasAlerted) {
+            hasAlerted = true;
+            alert("Siz qoidalarni 5 marta buzdingiz, test yakunlandi!");
+            await submitTest(); // Submit test automatically if not submitted
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1000);
+          }
+        } catch (error) {
+          console.error("Failed to fetch warnings:", error);
+        }
+      }
+
+      fetchWarnings();
+      setInterval(fetchWarnings, 500);
     </script>
-</body>
+  </body>
 </html>

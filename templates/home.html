@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="../static/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masofaviy test tizimi</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #start-btn {
+        margin-top: 50px;
+        padding: 15px 30px;
+        font-size: 18px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      #start-btn:hover {
+        background-color: #0056b3;
+      }
+      .results-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px auto;
+        max-width: 600px;
+        text-align: left;
+      }
+      .question-result {
+        margin: 10px 0;
+        padding: 10px;
+        border: 2px solid #ccc;
+      }
+      .correct {
+        border-color: green;
+      }
+      .incorrect {
+        border-color: red;
+      }
+      #welcome-section {
+        display: block;
+      }
+      #results-section {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="welcome-section">
+      <h1>Sun'iy Intellekt Testiga Xush Kelibsiz!</h1>
+      <button id="start-btn" onclick="startTest()">Testni Boshlash</button>
+    </div>
+
+    <div id="results-section" class="results-container">
+      <h2>Oxirgi test natijalari</h2>
+      <p id="results-summary"></p>
+      <div id="results-details"></div>
+      <button id="start-btn" onclick="startTest()">Yangi test boshlash</button>
+    </div>
+
+    <script>
+      function startTest() {
+        window.location.href = "/test";
+      }
+
+      // Sahifa yuklanganda test natijalarini tekshiramiz
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/get-results")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data && data.score !== undefined) {
+              // Natijalarni ko'rsatish
+              document.getElementById("welcome-section").style.display = "none";
+              document.getElementById("results-section").style.display =
+                "block";
+
+              // Umumiy natija
+              document.getElementById(
+                "results-summary"
+              ).textContent = `Siz ${data.total} tadan ${data.score} ta to'g'ri javob berdingiz!`;
+
+              // Har bir savol uchun natija
+              const detailsContainer =
+                document.getElementById("results-details");
+              detailsContainer.innerHTML = "";
+
+              data.details.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = `question-result ${
+                  item.isCorrect ? "correct" : "incorrect"
+                }`;
+                div.innerHTML = `
+                                <p><strong>${index + 1}. ${
+                  item.question
+                }</strong></p>
+                                <p>Tanlangan javob: ${
+                                  item.selected || "Javob berilmagan"
+                                }</p>
+                            `;
+                detailsContainer.appendChild(div);
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Natijalarni yuklashda xato:", error);
+          });
+      });
+    </script>
+  </body>
+</html>
